@@ -1,0 +1,104 @@
+﻿@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = "Edit a Scripture";
+
+    var book = "";
+    var chapter = "";
+    var verse = "";
+    var note = "";
+    var createDate = "";
+    var ScriptureId = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["ID"].IsEmpty() && Request.QueryString["ID"].IsInt())
+        {
+            ScriptureId = Request.QueryString["ID"];
+            var db = Database.Open("scripturejournal");
+            var dbCommand = "SELECT * FROM Scripture WHERE ID = @0";
+            var row = db.QuerySingle(dbCommand, ScriptureId);
+
+            if (row != null)
+            {
+                book = row.Book;
+                chapter = row.Chapter;
+                verse = row.Verse;
+                note = row.Note;
+                createDate = row.CreateDate;
+            }
+            else
+            {
+                Validation.AddFormError("No scripture was selected.");
+                
+            }
+        }
+        else
+        {
+            Validation.AddFormError("No scripture was selected.");
+            
+        }
+    }
+
+    if (IsPost)
+    {
+        Validation.RequireField("book", "You must enter the book name");
+        Validation.RequireField("chapter", "Enter the chapter number");
+        Validation.RequireField("verse", "Enter the chapter verse");
+        Validation.RequireField("note", "Add notes");
+        Validation.RequireField("createDate", "Enter the date");
+
+
+        book = Request.Form["book"];
+        chapter = Request.Form["chapter"];
+        verse = Request.Form["verse"];
+        note = Request.Form["note"];
+        createDate = Request.Form["createDate"];
+        ScriptureId = Request.Form["ScriptureId"];
+
+        if (Validation.IsValid())
+        {
+            var db = Database.Open("scripturejournal");
+            var updateCommand = "UPDATE Scripture SET Book=@0, Chapter=@1, Verse=@2, Note=@3, CreateDate=@4, WHERE Id=@5";
+            db.Execute(updateCommand, book, chapter, verse, note, createDate, ScriptureId);
+            Response.Redirect("~/Scripture");
+        }
+    }
+}
+
+<h2>Edit a Scripture</h2>
+@Html.ValidationSummary()
+<form method="post">
+    <fieldset>
+        <legend>Scripture Information</legend>
+
+        <p>
+            <label for="book">Book:</label>
+            <input type="text" name="book" value="@book" />
+        </p>
+
+        <p>
+            <label for="chapter">Chapter:</label>
+            <input type="text" name="chapter" value="@chapter" />
+        </p>
+
+        <p>
+            <label for="verse">Verse:</label>
+            <input type="text" name="verse" value="@verse" />
+        </p>
+
+        <p>
+            <label for="note">Note:</label>
+            <input type="text" name="note" value="@note" />
+        </p>
+
+        <p>
+            <label for="createDate">CreateDate:</label>
+            <input type="text" name="createDate" value="@createDate" />
+        </p>
+
+        <input type="hidden" name="ScriptureId" value="@ScriptureId" />
+
+        <p><input type="submit" name="buttonSubmit" value="Submit Changes" /></p>
+    </fieldset>
+</form>
+<p><a href="~/ViewAllScripture">Return to scripture listing</a></p>
