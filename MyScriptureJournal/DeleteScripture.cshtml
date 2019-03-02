@@ -6,6 +6,7 @@
     var chapter = "";
     var verse = "";
     var note = "";
+    DateTime date = DateTime.MinValue;
     var createDate = "";
     var ScriptureId = "";
 
@@ -15,7 +16,7 @@
         {
             ScriptureId = Request.QueryString["ID"];
             var db = Database.Open("scripturejournal");
-            var dbCommand = "SELECT * FROM Scripture WHERE ID = @0";
+            var dbCommand = "SELECT * FROM Scripture WHERE ScriptureId = @0";
             var row = db.QuerySingle(dbCommand, ScriptureId);
 
 
@@ -25,7 +26,9 @@
                 chapter = row.Chapter;
                 verse = row.Verse;
                 note = row.Note;
-                createDate = row.CreateDate;
+                date = row.createDate;
+                createDate = date.ToString();
+
             }
             else
             {
@@ -44,9 +47,9 @@
     {
         ScriptureId = Request.Form["ScriptureId"];
         var db = Database.Open("scripturejournal");
-        var deleteCommand = "DELETE FROM Scripture WHERE ID = @0";
+        var deleteCommand = "DELETE FROM Scripture WHERE ScriptureId = @0";
         db.Execute(deleteCommand, ScriptureId);
-        Response.Redirect("~/Scripture");
+        Response.Redirect("~/ViewAllScripture");
     }
 
 }

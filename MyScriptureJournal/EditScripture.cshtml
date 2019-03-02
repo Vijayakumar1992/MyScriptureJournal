@@ -6,6 +6,7 @@
     var chapter = "";
     var verse = "";
     var note = "";
+    DateTime date;
     var createDate = "";
     var ScriptureId = "";
 
@@ -15,7 +16,7 @@
         {
             ScriptureId = Request.QueryString["ID"];
             var db = Database.Open("scripturejournal");
-            var dbCommand = "SELECT * FROM Scripture WHERE ID = @0";
+            var dbCommand = "SELECT * FROM Scripture WHERE ScriptureId = @0";
             var row = db.QuerySingle(dbCommand, ScriptureId);
 
             if (row != null)
@@ -24,18 +25,20 @@
                 chapter = row.Chapter;
                 verse = row.Verse;
                 note = row.Note;
-                createDate = row.CreateDate;
+                date = row.CreateDate;
+                createDate = date.ToString();
+
             }
             else
             {
                 Validation.AddFormError("No scripture was selected.");
-                
+
             }
         }
         else
         {
             Validation.AddFormError("No scripture was selected.");
-            
+
         }
     }
 
@@ -45,7 +48,9 @@
         Validation.RequireField("chapter", "Enter the chapter number");
         Validation.RequireField("verse", "Enter the chapter verse");
         Validation.RequireField("note", "Add notes");
-        Validation.RequireField("createDate", "Enter the date");
+        Validation.RequireField("createDate", "Enter Date");
+        Validation.RequireField("ScriptureId", "Enter Scripture ID");
+
 
 
         book = Request.Form["book"];
@@ -58,9 +63,9 @@
         if (Validation.IsValid())
         {
             var db = Database.Open("scripturejournal");
-            var updateCommand = "UPDATE Scripture SET Book=@0, Chapter=@1, Verse=@2, Note=@3, CreateDate=@4, WHERE Id=@5";
+            var updateCommand = "UPDATE Scripture SET Book=@0, Chapter=@1, Verse=@2, Note=@3, CreateDate=@4  WHERE ScriptureId=@5";
             db.Execute(updateCommand, book, chapter, verse, note, createDate, ScriptureId);
-            Response.Redirect("~/Scripture");
+            Response.Redirect("~/ViewAllScripture");
         }
     }
 }
